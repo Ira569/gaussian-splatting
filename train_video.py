@@ -23,6 +23,6 @@ subprocess.run(command, shell=True)
 # COLMAP估算相机位姿
 command = f'python convert.py -s {folder_path}'
 subprocess.run(command, shell=True)
-# 模型训练脚本，模型会保存在output路径下 自带的环境是cpu训练... 怪不得无需环境配置呢，不过对debug来说也没什么影响，还挺好的也许
+# 模型训练脚本，模型会保存在output路径下 自带的环境是cpu训练...
 command = f'python train.py -s {folder_path}'
 subprocess.run(command, shell=True)

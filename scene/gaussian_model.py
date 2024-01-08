@@ -96,7 +96,7 @@ class GaussianModel:
     def get_scaling(self):
         return self.scaling_activation(self._scaling)
     
-    @property
+    @property     # 四元数
     def get_rotation(self):
         return self.rotation_activation(self._rotation)
     
@@ -104,7 +104,7 @@ class GaussianModel:
     def get_xyz(self):
         return self._xyz
     
-    @property
+    @property # 球谐函数参数？
     def get_features(self):
         features_dc = self._features_dc
         features_rest = self._features_rest
