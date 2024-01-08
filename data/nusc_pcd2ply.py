@@ -2,6 +2,7 @@ import open3d as o3d
 import numpy as np
 from plyfile import PlyData, PlyElement
 #   nuscenes lidar (x,y,z,intensity,ring index)
+# 来自lidar_top的点云数据 软件可以看到是在车前上方的
 lidar_file = r"nuscenes-6imgs/example.pcd.bin"
 lidar_points = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5) # (point_num,5)
 lidar_points_xyz = lidar_points[:,:3]

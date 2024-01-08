@@ -2,7 +2,10 @@ import os
 import subprocess
 
 # 图片集所在的绝对路径
-images_path = r"D:\gitlab2024\gaussian-splatting\data\ggbond\input"
+images_path = r"E:\NeRF_git\gaussian-splatting\data\ggbond-copy\input"
+
+images_path = r"E:\NeRF_git\gaussian-splatting\data\nuscenes-6imgs\input"
+
 
 # 上一级文件夹所在路径
 folder_path = os.path.dirname(images_path)

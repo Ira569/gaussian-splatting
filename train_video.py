@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # 视频绝对路径
-video_path = r"D:\CSstudy\gaussian-splatting\data\ggbond\ggbond.mp4"
+video_path = r"E:\NeRF_git\gaussian-splatting\data\ggbond\ggbond.mp4"
 # 切分帧数，每秒多少帧
 fps = 2
 
