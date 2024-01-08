@@ -2,7 +2,7 @@ from nuscenes.nuscenes import NuScenes
 
 # 数据集根目录的路径
 # data_root = '/path/to/nuscenes/dataset/'
-data_root = '/CSstudy/gaussian-splatting/data//nuscenes'
+data_root = r'CSstudy/gaussian-splatting/data/nuscenes'
 
 # 创建NuScenes对象
 nusc = NuScenes(version='v1.0-mini', dataroot=data_root, verbose=True)
