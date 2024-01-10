@@ -112,6 +112,14 @@ def fetchPly(path):
     normals = np.vstack([vertices['nx'], vertices['ny'], vertices['nz']]).T
     return BasicPointCloud(points=positions, colors=colors, normals=normals)
 
+def fetchNuscenesPly(path):
+    plydata = PlyData.read(path)
+    vertices = plydata['vertex']
+    positions = np.vstack([vertices['x'], vertices['y'], vertices['z']]).T
+    num_pts = positions.shape[0]
+    shs = np.random.random((num_pts, 3)) / 255.0
+    return BasicPointCloud(points=positions, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
+
 def storePly(path, xyz, rgb):
     # Define the dtype for the structured array
     dtype = [('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
@@ -219,16 +227,15 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
     return cam_infos
 
 
-def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, extension=".png"):
+def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, extension=".jpg"):
     cam_infos = []
 
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
-
-        fovx = contents["camera_angle_x"]
-
-        frames = contents["frames"]
-        for idx, frame in enumerate(frames):
+        # fovx = contents["camera_angle_x"]
+        # fovx=1
+        # frames = contents["frames"]
+        for idx, frame in enumerate(contents):
             cam_name = os.path.join(path, frame["file_path"] + extension)
 
             # NeRF 'transform_matrix' is a camera-to-world transform
@@ -253,7 +260,9 @@ def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, ex
             arr = norm_data[:, :, :3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
             image = Image.fromarray(np.array(arr * 255.0, dtype=np.byte), "RGB")
 
-            fovy = focal2fov(fov2focal(fovx, image.size[0]), image.size[1])
+            fovx = focal2fov(frame["fx"], image.size[0])
+            fovy = focal2fov(frame["fy"], image.size[1])
+            # fovy = focal2fov(fov2focal(fovx, image.size[0]), image.size[1])
             FovY = fovy
             FovX = fovx
 
@@ -263,9 +272,9 @@ def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, ex
 
     return cam_infos
 
-def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
+def readNerfSyntheticInfo(path, white_background, eval, extension=".jpg"):
     print("Reading Training Transforms")
-    train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension)
+    train_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_train.json", white_background, extension)
     print("Reading Test Transforms")
     test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension)
     
@@ -300,11 +309,12 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
     return scene_info
 
 
-def readNuscenesInfo(path, white_background, eval, extension=".png"):
+def readNuscenesInfo(path, white_background, eval, extension=".jpg"):
+    # nuscenes 相机坐标系与Colmap完全一致
     print("Reading Training Transforms")
-    train_cam_infos = readCamerasFromTransforms(path, "json_list_exam.json", white_background, extension)
+    train_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_nusc_train.json", white_background, extension)
     print("Reading Test Transforms")
-    test_cam_infos = readCamerasFromTransforms(path, "json_list_exam.json", white_background, extension)
+    test_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_nusc_test.json", white_background, extension)
 
     if not eval:
         train_cam_infos.extend(test_cam_infos)
@@ -325,7 +335,7 @@ def readNuscenesInfo(path, white_background, eval, extension=".png"):
 
         storePly(ply_path, xyz, SH2RGB(shs) * 255)
     try:
-        pcd = fetchPly(ply_path)
+        pcd = fetchNuscenesPly(ply_path)
     except:
         pcd = None
 
