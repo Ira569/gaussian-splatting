@@ -54,8 +54,8 @@ lidar_points = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)
 # lidar_points -> ego_pose0
 # lidar_points是基于lidar coordinate而言的
 # lidar_coordinate  lidar_pose(基于ego)
-# lidar_points = lidar_pose @ lidar_points   # lidar -> ego
-
+# lidar_points = lidar_pose @ lidar_points  # lidar -> ego
+# lidar_poiints  这里的lidar_points应该是列向量，  转成 lidar_points(行向量）*lidar_pose.T也是等价的，只不过结果是行向量了
 def get_matrix(calibrated_data, inverse=False):
     output = np.eye(4)
     output[:3, :3] = Quaternion(calibrated_data["rotation"]).rotation_matrix
@@ -82,7 +82,16 @@ hom_points = np.concatenate([lidar_points[:, :3], np.ones((len(lidar_points), 1)
 global_points = hom_points @ lidar_to_global.T   # lidar_points -> global
 cameras = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT']
 
+import json
+gaussion_camera_json=[{"id":0,"img_name":"CAM_BACK","width":1600,"height":900,
+                      "position":[411.4449780367985, 1181.2631893914647, 0.0],
+                      "rotation":[[],[],[]],"fy":1,"fy":1}]
+
+json_list = []
+
+id = 0
 for cam in cameras:
+
     camera_token = sample["data"][cam]
     camera_data  = nuscenes.get("sample_data", camera_token)
     image_file = os.path.join(dataroot, camera_data["filename"])
@@ -100,7 +109,15 @@ for cam in cameras:
     
     # global -> camera_ego_pose -> image
     global_to_image = camera_intrinsic @ ego_to_camera @ global_to_ego
-    
+
+    id = id + 1
+    camera_data ={"id":id,"img_name":cam,
+                  "width":int(camera_intrinsic[0][2]*2),"height":int(camera_intrinsic[1][2]*2),
+                  "position":camera_ego_pose["translation"],
+                  "rotation":Quaternion(camera_ego_pose["rotation"]).rotation_matrix.tolist(),
+                  "fy":camera_intrinsic[1][1],"fx":camera_intrinsic[0][0]}
+    json_list.append(camera_data)
+
     for token in sample["anns"]:
         annotation = nuscenes.get("sample_annotation", token)
         box = Box(annotation['translation'], annotation['size'], Quaternion(annotation['rotation']))
@@ -118,7 +135,7 @@ for cam in cameras:
             
     # 坐标变换了
     image_points = global_points @ global_to_image.T  # global -> image
-    image_points[:, :2] /= image_points[:, [2]]
+    image_points[:, :2] /= image_points[:, [2]]  # x=x/z y=y/z z=z 1
     
     # 过滤z<=0的点，因为它在图像平面的后面。形不成投影的
     # z > 0
@@ -127,5 +144,10 @@ for cam in cameras:
     
     cv2.imwrite(f"{cam}.jpg", image)
 
+json_string = json.dumps(json_list)
+with open("json_list_exam.json", "w") as json_file:
+    json_file.write(json_string)
+
+print("JSON 文件已生成！")
 
 print ('done')
