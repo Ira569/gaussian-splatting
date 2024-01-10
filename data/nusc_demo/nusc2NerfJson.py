@@ -63,7 +63,7 @@ for cam in cameras:
     id = id + 1
     camera_dict = {"id": id, "file_path": './images/'+cam,
                    "width": int(camera_intrinsic[0][2] * 2), "height": int(camera_intrinsic[1][2] * 2),
-                   "transform_matrix":global_to_ego.tolist(),
+                   "transform_matrix":ego_to_camera.tolist(),
                    "fy": camera_intrinsic[1][1], "fx": camera_intrinsic[0][0]}
     json_list.append(camera_dict)
 

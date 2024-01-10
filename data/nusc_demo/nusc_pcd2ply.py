@@ -3,29 +3,70 @@ import numpy as np
 from plyfile import PlyData, PlyElement
 #   nuscenes lidar (x,y,z,intensity,ring index)
 # 来自lidar_top的点云数据 软件可以看到是在车前上方的
-lidar_file = r"nuscenes-6imgs/example.pcd.bin"
+# lidar_file = r"nuscenes-6imgs/example.pcd.bin"
+
+from nuscenes.nuscenes import NuScenes
+from pyquaternion import Quaternion
+from nuscenes.utils.data_classes import Box
+import numpy as np
+import cv2
+import os
+
+np.set_printoptions(precision=3, suppress=True)
+
+# 构建nuScenes类
+version = "v1.0-mini"
+dataroot = "E:/NeRF_git/gaussian-splatting/data/nuscenes"
+nuscenes = NuScenes(version, dataroot, verbose=False)
+
+sample = nuscenes.sample[0]
+
+# 获取lidar的数据
+lidar_token = sample["data"]["LIDAR_TOP"]
+lidar_sample_data = nuscenes.get('sample_data', lidar_token)
+lidar_file = os.path.join(dataroot, lidar_sample_data["filename"])
+
+
 lidar_points = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5) # (point_num,5)
 lidar_points_xyz = lidar_points[:,:3]
+#  将ladar_points 转到ego坐标系
+lidar_calibrated_data = nuscenes.get("calibrated_sensor", lidar_sample_data["calibrated_sensor_token"])
+from myvisualize import  get_matrix
+# lidar_pose是基于ego而言的
+# point = lidar_pose @ lidar_points.T  代表了 lidar -> ego 的过程
+lidar_to_ego = get_matrix(lidar_calibrated_data)
 
+#  ego_pose0 -> global
+# ego_pose就是基于global坐标系的
+# ego_pose @ ego_points.T     ego -> global
+# lidar_points -> N x 5(x, y, z, intensity, ringindex)
+# x, y, z -> x, y, z, 1
+hom_points = np.concatenate([lidar_points[:, :3], np.ones((len(lidar_points), 1))], axis=1)
+ego_points = hom_points @ lidar_to_ego.T   # lidar_points -> ego
+
+lidar_points_xyz = ego_points[:,:3]
+
+
+point_cloud = o3d.geometry.PointCloud()
+point_cloud.points = o3d.utility.Vector3dVector(lidar_points_xyz)
+
+# 保存点云数据为PLY文件  但这还是lidar坐标系下的
+o3d.io.write_point_cloud('./pc2ego_output.ply', point_cloud)
 # ply格式：
 # x：点的x坐标（浮点数# y：点的y坐标（浮点数# z：点的z坐标（浮点数）
 # nx：法线向量的x分量（浮点数）# ny：法线向量的y分量（浮点数）# nz：法线向量的z分量（浮点数）
 # red：点的红色分量（无符号字符# green：点的绿色分量（无符号字符）# blue：点的蓝色分量（无符号字符
 
 
-plydata = PlyData.read('nuscenes-6imgs/input_example.ply')
-vertices = plydata['vertex']
-x = vertices['x']
-y = vertices['y']
-z = vertices['z']
+# plydata = PlyData.read('nuscenes-6imgs/input_example.ply')
+# vertices = plydata['vertex']
+# x = vertices['x']
+# y = vertices['y']
+# z = vertices['z']
+#
+# points = np.column_stack((x, y, z))  # (6381,3)
+#
 
-points = np.column_stack((x, y, z))  # (6381,3)
-
-point_cloud = o3d.geometry.PointCloud()
-point_cloud.points = o3d.utility.Vector3dVector(lidar_points_xyz)
-
-# 保存点云数据为PLY文件
-o3d.io.write_point_cloud('nuscenes-6imgs/output.ply', point_cloud)
 
 # json 文件： id,img_name,width,height,position,rotation,fy,fx
 # 其实就是内参矩阵 K 与 外参矩阵[R T]  K自带的数据集里有， RT好像也有需要转换一下，TODO 吃完饭在搞
