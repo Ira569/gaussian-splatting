@@ -1,7 +1,7 @@
 import subprocess
 
 # output保存路径
-model_path = r'D:\CSstudy\gaussian-splatting\output\ggbond'
+model_path = r'E:\NeRF_git\gaussian-splatting\output\nusc-demo2'
 
 # 脚本执行
 command = f'SIBR_gaussianViewer_app.exe -m {model_path}'
