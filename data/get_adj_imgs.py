@@ -12,7 +12,7 @@ import os
 version = "v1.0-mini"
 dataroot = "nuscenes"
 nuscenes = NuScenes(version, dataroot, verbose=False)
-
+# TODO  按照判断取next是否为空的方式，获得该场景的所有sample,再进行训练.
 sample = nuscenes.sample[0]
 sample1 = nuscenes.sample[1]
 sample2 = nuscenes.sample[2]
