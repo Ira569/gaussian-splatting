@@ -51,14 +51,14 @@ json_list = []
 id = 0
 sample_list =[sample,sample_next,sample_next_next]
 sample_id = 0
-
+# 即使是在同一帧， 每个相机对应的time-stamp和ego_pose也都不一样
 global2ego = None
 cam = 'CAM_FRONT_LEFT'
 camera_token = sample["data"][cam]
 camera_data = nuscenes.get("sample_data", camera_token)
 camera_ego_pose = nuscenes.get("ego_pose", camera_data["ego_pose_token"])
-global2ego0=get_matrix(camera_ego_pose, True)
-ego02global= np.linalg.inv(global2ego0)
+ego02global=get_matrix(camera_ego_pose)
+# ego02global= np.linalg.inv(global2ego0)
 for sample in sample_list:
 
 
