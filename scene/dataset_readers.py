@@ -238,7 +238,7 @@ def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, ex
         for idx, frame in enumerate(contents):
             cam_name = os.path.join(path, frame["file_path"] + extension)
 
-            # NeRF 'transform_matrix' is a camera-to-world transform
+            # NeRF 'transform_matrix' is a camera-to-world transform nuscenes的转换矩阵也是cam2ego
             c2w = np.array(frame["transform_matrix"])
             # change from OpenGL/Blender camera axes (Y up, Z back) to COLMAP (Y down, Z forward)
             # c2w[:3, 1:3] *= -1
@@ -284,7 +284,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".jpg"):
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
-    ply_path = os.path.join(path, "pc2ego_output.ply")
+    ply_path = os.path.join(path, "points3d.ply")
     if not os.path.exists(ply_path):
         # Since this data set has no colmap data, we start with random points
         num_pts = 100_000
@@ -312,7 +312,7 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".jpg"):
 def readNuscenesInfo(path, white_background, eval, extension=".jpg"):
     # nuscenes 相机坐标系与Colmap完全一致
     print("Reading Training Transforms")
-    train_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_nusc_train.json", white_background, extension)
+    train_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_nusc3imgs_train.json", white_background, extension)
     print("Reading Test Transforms")
     test_cam_infos = readCamerasFromNuscenesTransforms(path, "transforms_nusc_test.json", white_background, extension)
 
