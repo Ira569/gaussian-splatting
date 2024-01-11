@@ -51,6 +51,14 @@ json_list = []
 id = 0
 sample_list =[sample,sample_next,sample_next_next]
 sample_id = 0
+
+global2ego = None
+cam = 'CAM_FRONT_LEFT'
+camera_token = sample["data"][cam]
+camera_data = nuscenes.get("sample_data", camera_token)
+camera_ego_pose = nuscenes.get("ego_pose", camera_data["ego_pose_token"])
+global2ego0=get_matrix(camera_ego_pose, True)
+ego02global= np.linalg.inv(global2ego0)
 for sample in sample_list:
 
 
@@ -63,23 +71,25 @@ for sample in sample_list:
 
         camera_ego_pose = nuscenes.get("ego_pose", camera_data["ego_pose_token"])
 
-        # ego pose本身就是基于global而言的
+        # ego pose本身就是基于global而言的  ego_pose 本身就代表了 ego2global的矩阵
         global_to_ego = get_matrix(camera_ego_pose, True)  # global -> ego
 
         camera_calibrated = nuscenes.get("calibrated_sensor", camera_data["calibrated_sensor_token"])
         ego_to_camera = get_matrix(camera_calibrated, True)  # ego -> camera
         camera_intrinsic = np.eye(4)
         camera_intrinsic[:3, :3] = camera_calibrated["camera_intrinsic"]
-
+        # 我应该传c2w还是应该传w2c啊 应该传c2w
         # global -> camera_ego_pose -> image
         global_to_cam = ego_to_camera @ global_to_ego
-
+        cam2global=np.linalg.inv(global_to_cam)
+        ego02cam =  ego_to_camera@global_to_ego @ego02global
+        cam2ego0=np.linalg.inv(ego02cam)
         global_to_image = camera_intrinsic @ ego_to_camera @ global_to_ego
 
         id = id + 1
-        camera_dict = {"id": id, "file_path": "../"+image_file,
+        camera_dict = {"id": id, "file_path": image_file,
         "width": image.shape[1], "height": image.shape[0],
-        "transform_matrix":global_to_cam.tolist(),
+        "transform_matrix":cam2ego0.tolist(),
         "fy": camera_intrinsic[1][1], "fx": camera_intrinsic[0][0]}
         json_list.append(camera_dict)
 
@@ -87,7 +97,7 @@ for sample in sample_list:
     sample_id +=1
 
 json_string = json.dumps(json_list)
-with open("transforms_nusc3imgs_train.json", "w") as json_file:
+with open("nusc_demo/transforms_nusc3imgs_train.json", "w") as json_file:
     json_file.write(json_string)
 
 print("JSON 文件已生成！")

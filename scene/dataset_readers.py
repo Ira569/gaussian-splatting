@@ -236,7 +236,7 @@ def readCamerasFromNuscenesTransforms(path, transformsfile, white_background, ex
         # fovx=1
         # frames = contents["frames"]
         for idx, frame in enumerate(contents):
-            cam_name = os.path.join(path, frame["file_path"] + extension)
+            cam_name = os.path.join(os.path.dirname (path), frame["file_path"])
 
             # NeRF 'transform_matrix' is a camera-to-world transform nuscenes的转换矩阵也是cam2ego
             c2w = np.array(frame["transform_matrix"])
