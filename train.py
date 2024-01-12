@@ -68,6 +68,8 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
         gaussians.update_learning_rate(iteration)
 
+        if iteration % 100 == 0:
+            print('gaussian nums:',gaussians.get_features.shape[0])
         # Every 1000 its we increase the levels of SH up to a maximum degree
         if iteration % 1000 == 0:
             gaussians.oneupSHdegree()
@@ -195,13 +197,17 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Training script parameters")
     lp = ModelParams(parser)
     op = OptimizationParams(parser)
+
+    op.densify_until_iter=1500
+
+
     pp = PipelineParams(parser)
     parser.add_argument('--ip', type=str, default="127.0.0.1")
     parser.add_argument('--port', type=int, default=6009)
     parser.add_argument('--debug_from', type=int, default=-1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
-    parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])
-    parser.add_argument("--save_iterations", nargs="+", type=int, default=[7_000, 30_000])
+    parser.add_argument("--test_iterations", nargs="+", type=int, default=[5_000, 30_000])
+    parser.add_argument("--save_iterations", nargs="+", type=int, default=[5_000, 30_000])
     # parser.add_argument("--test_iterations", nargs="+", type=int, default=[500, 5_000])
     # parser.add_argument("--save_iterations", nargs="+", type=int, default=[500, 5_000])
     parser.add_argument("--quiet", action="store_true")

@@ -1,7 +1,7 @@
 import subprocess
 
 # output保存路径
-model_path = r'E:\NeRF_git\gaussian-splatting\output/d0f66373-2'
+model_path = r'E:\NeRF_git\gaussian-splatting\output/4df529d9-2'
 # model_path = r'E:\NeRF_git\gaussian-splatting\output/ggbond'
 
 # 脚本执行

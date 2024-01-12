@@ -10,7 +10,7 @@ np.set_printoptions(precision=3, suppress=True)
 
 # 构建nuScenes类
 version = "v1.0-mini"
-dataroot = "E:/NeRF_git/gaussian-splatting/data/nuscenes"
+dataroot = "nuscenes"
 nuscenes = NuScenes(version, dataroot, verbose=False)
 
 sample = nuscenes.sample[0]

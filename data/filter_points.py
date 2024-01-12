@@ -16,7 +16,7 @@ np.set_printoptions(precision=3, suppress=True)
 
 # 构建nuScenes类
 version = "v1.0-mini"
-dataroot = "E:/NeRF_git/gaussian-splatting/data/nuscenes"
+dataroot = "nuscenes"
 nuscenes = NuScenes(version, dataroot, verbose=False)
 
 sample = nuscenes.sample[0]
@@ -46,12 +46,19 @@ ego_points = hom_points @ lidar_to_ego.T   # lidar_points -> ego
 # TODO 在ego周围的x,y,z某范围内的点云直接删掉，不然会影响生成高斯可视化的效果
 #  mask = ego_points
 
-
 lidar_points_xyz = ego_points[:,:3]
-
+mask_z_max = lidar_points_xyz[:,2]<1.7
+mask_z_min = lidar_points_xyz[:,2]>-1
+mask_x_max = lidar_points_xyz[:,0]<3
+mask_x_min = lidar_points_xyz[:,0]>-0.5
+mask_y_max = lidar_points_xyz[:,1]<0.8
+mask_y_min = lidar_points_xyz[:,1]>-0.8
+not_selected = mask_z_max & mask_z_min & mask_x_max & mask_x_min & mask_y_max & mask_y_min
+selected = ~not_selected
+selected_points = lidar_points_xyz[selected]
 
 point_cloud = o3d.geometry.PointCloud()
-point_cloud.points = o3d.utility.Vector3dVector(lidar_points_xyz)
+point_cloud.points = o3d.utility.Vector3dVector(selected_points)
 
 # 保存点云数据为PLY文件  但这还是lidar坐标系下的
 o3d.io.write_point_cloud('./filtered_pc2ego_output.ply', point_cloud)
