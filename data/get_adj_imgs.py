@@ -32,7 +32,7 @@ def get_matrix(calibrated_data, inverse=False):
         output = np.linalg.inv(output)
     return output
 
-cameras = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT']
+cameras = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_RIGHT','CAM_BACK','CAM_BACK_LEFT', ]
 
 import json
 nerf_like_json = [{"id": 1, "file_path": "./images/CAM_FRONT_LEFT",
@@ -50,6 +50,7 @@ json_list = []
 
 id = 0
 sample_list =[sample,sample_next,sample_next_next]
+sample_list=[sample]
 sample_id = 0
 # 即使是在同一帧， 每个相机对应的time-stamp和ego_pose也都不一样
 global2ego = None

@@ -400,6 +400,27 @@ class GaussianModel:
             prune_mask = torch.logical_or(torch.logical_or(prune_mask, big_points_vs), big_points_ws)
         self.prune_points(prune_mask)
 
+
+        mask_x_min = self.get_xyz.data[:, 0] > -2
+        mask_x_max = self.get_xyz.data[:, 0] < 2
+        mask_y_min = self.get_xyz.data[:, 1] > -2
+        mask_y_max = self.get_xyz.data[:, 1] < 2
+        mask_z_min = self.get_xyz.data[:, 2] > -1
+        mask_z_max = self.get_xyz.data[:, 2] < 3
+        pos_mask = mask_z_max & mask_z_min & mask_x_max & mask_x_min & mask_y_max & mask_y_min
+        self.prune_points(pos_mask)
+
+        mask_x_min = self.get_xyz.data[:, 0] > 60
+        mask_x_max = self.get_xyz.data[:, 0] < -60
+        mask_y_min = self.get_xyz.data[:, 1] > 60
+        mask_y_max = self.get_xyz.data[:, 1] < -60
+        mask_z_min = self.get_xyz.data[:, 2] > 10
+        mask_z_max = self.get_xyz.data[:, 2] < -1
+        pos_mask = mask_z_max | mask_z_min | mask_x_max | mask_x_min | mask_y_max | mask_y_min
+        self.prune_points(pos_mask)
+
+
+
         torch.cuda.empty_cache()
 
     def add_densification_stats(self, viewspace_point_tensor, update_filter):
