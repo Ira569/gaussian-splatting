@@ -10,11 +10,12 @@ np.set_printoptions(precision=3, suppress=True)
 
 # 构建nuScenes类
 version = "v1.0-mini"
-dataroot = "E:/NeRF_git/gaussian-splatting/data/nuscenes"
+dataroot = "../nuscenes"
 nuscenes = NuScenes(version, dataroot, verbose=False)
 
 sample = nuscenes.sample[0]
-
+scene = nuscenes.get("scene", 'cc8c0bf57f984915a77078b10eb33198')
+scene_name =scene['name']
 def get_matrix(calibrated_data, inverse=False):
     output = np.eye(4)
     output[:3, :3] = Quaternion(calibrated_data["rotation"]).rotation_matrix
@@ -26,13 +27,13 @@ def get_matrix(calibrated_data, inverse=False):
 cameras = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT']
 
 import json
-nerf_like_json = [{"id": 1, "file_path": "./images/CAM_FRONT_LEFT",
-                   "width": 1653, "height": 959,
-                   "transform_matrix": [[-0.3456006895797708, 0.9382316025189897, 0.0167816386755018,1],
-                                        [-0.9383334713320822, -0.3453464096120683, -0.016314225263176777,2],
-                                        [-0.009511043048534566, -0.021384980773937943, 0.9997260738109348,3],
-                                        [0,0,0,1]],
-                   "fy": 1272.5979470598488, "fx": 1272.5979470598488}]
+# nerf_like_json = [{"id": 1, "file_path": "./images/CAM_FRONT_LEFT",
+#                    "width": 1653, "height": 959,
+#                    "transform_matrix": [[-0.3456006895797708, 0.9382316025189897, 0.0167816386755018,1],
+#                                         [-0.9383334713320822, -0.3453464096120683, -0.016314225263176777,2],
+#                                         [-0.009511043048534566, -0.021384980773937943, 0.9997260738109348,3],
+#                                         [0,0,0,1]],
+#                    "fy": 1272.5979470598488, "fx": 1272.5979470598488}]
 # gaussion_camera_json = [{"id": 0, "img_name": "CAM_BACK", "width": 1600, "height": 900,
 #                          "position": [411.4449780367985, 1181.2631893914647, 0.0],
 #                          "rotation": [[], [], []], "fy": 1, "fy": 1}]
