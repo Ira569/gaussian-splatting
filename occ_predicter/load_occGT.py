@@ -1,5 +1,5 @@
 # 读取某一帧的GT  200，200，16
-occ_gt_path = '../data/nuscenes/gts/scene-0061/0cd661df01aa40c3bb3a773ba86f753a/labels.npz'
+# occ_gt_path = '../data/nuscenes/gts/scene-0061/0cd661df01aa40c3bb3a773ba86f753a/labels.npz'
 #  scene-num/frame_token/labels.npz
 import numpy as np
 
@@ -20,6 +20,8 @@ semantics = occ_labels['semantics']
 mask_lidar = occ_labels['mask_lidar']
 mask_camera = occ_labels['mask_camera']
 
+np.save('occ_label.npy',semantics)
+np.save('mask_camera.npy',mask_camera)
 print("load occ done!")
 # results['voxel_semantics'] = semantics
 # results['mask_lidar'] = mask_lidar
