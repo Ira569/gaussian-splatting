@@ -33,10 +33,10 @@ import torch
 #     ]
 # ).astype(np.uint8)
 
-#  rgb格式下的colors
+#  rgb格式下的colors    255,   0,   0 绿色
 colors = np.array(
     [
-        [0,   0,   0, 255],  # 0 others
+        [255,255,255, 255],  # 0 others red
         [255, 158, 0, 255],  # 1 'barrier'  orange
         [0, 0, 230, 255],    # 2 'bicycle'  Blue
         [47, 79, 79, 255],   # 3 'bus  Darkslategrey
@@ -88,7 +88,7 @@ pc_range = [-40, -40,  -1, 40, 40, 5.4]
 # visual_path ='vis_npy/gt_seman_10.npy'
 
 visual_path ='../occ_label.npy'
-visual_path ='../occ_pred.npy'
+# visual_path ='../occ_pred.npy'
 
 voxels = np.load(visual_path).astype(np.int32)
 
@@ -98,7 +98,7 @@ ignore_list = []
 fov_voxels = voxel2pcd(voxels)
 
 
-fov_voxels = fov_voxels[fov_voxels[..., 3] > 0]
+# fov_voxels = fov_voxels[fov_voxels[..., 3] > 0]
 fov_voxels = fov_voxels[fov_voxels[..., 3] != 17]
 fov_voxels[:, :3] = (fov_voxels[:, :3] + 0.5) * voxel_size
 fov_voxels[:, 0] += pc_range[0]
@@ -106,9 +106,9 @@ fov_voxels[:, 1] += pc_range[1]
 fov_voxels[:, 2] += pc_range[2]
 
 
-# figure = mlab.figure(size=(1440, 960), bgcolor=(0, 0, 0))
+figure = mlab.figure(size=(1440, 960), bgcolor=(0, 0, 0))
 
-figure = mlab.figure(size=(1440, 960), bgcolor=(1, 1, 1))
+# figure = mlab.figure(size=(1440, 960), bgcolor=(1, 1, 1))
 # pdb.set_trace()
 plt_plot_fov = mlab.points3d(
     fov_voxels[:, 0],
@@ -129,10 +129,55 @@ plt_plot_fov = mlab.points3d(
 plt_plot_fov.glyph.scale_mode = "scale_by_vector"
 plt_plot_fov.module_manager.scalar_lut_manager.lut.table = colors_grb
 
-filename = os.path.basename(visual_path) 
-file_without_extension = os.path.splitext(filename)[0]
 
-mlab.savefig('3dOcc_vis/'+file_without_extension+'.png')
+visual_path ='../occ_pred.npy'
+voxels2 = np.load(visual_path).astype(np.int32)
+
+ignore_list = []
+
+
+fov_voxels2 = voxel2pcd(voxels2)
+
+
+fov_voxels2 = fov_voxels2[fov_voxels2[..., 3] > 0]
+# fov_voxels2 = fov_voxels2[fov_voxels2[..., 3] != 17]
+fov_voxels2[:, :3] = (fov_voxels2[:, :3] + 0.5) * voxel_size
+fov_voxels2[:, 0] += pc_range[0]
+fov_voxels2[:, 1] += pc_range[1]
+fov_voxels2[:, 2] += pc_range[2]
+
+figure2 = mlab.figure(size=(1440, 960), bgcolor=(0, 0, 0))
+# figure2 = mlab.figure(size=(1440, 960), bgcolor=(1, 1, 1))
+
+# pdb.set_trace()
+plt_plot_fov = mlab.points3d(
+    fov_voxels2[:, 0],
+    fov_voxels2[:, 1],
+    fov_voxels2[:, 2],
+    fov_voxels2[:, 3],
+    # colormap="viridis",
+    colormap='brg',
+    # scale_factor=voxel_size - 0.05*voxel_size,
+    scale_factor=1,
+    mode="cube",
+    opacity=1.0,
+    vmin=0,
+    vmax=19,
+)
+
+
+plt_plot_fov.glyph.scale_mode = "scale_by_vector"
+plt_plot_fov.module_manager.scalar_lut_manager.lut.table = colors_grb
+
+
+
+
+
+
+# filename = os.path.basename(visual_path) 
+# file_without_extension = os.path.splitext(filename)[0]
+
+# mlab.savefig('3dOcc_vis/'+file_without_extension+'.png')
 mlab.show()
 
 
