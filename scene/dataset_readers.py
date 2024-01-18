@@ -323,6 +323,7 @@ def readNuscenesInfo(path, white_background, eval, extension=".jpg"):
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
     ply_path = os.path.join(path, "pc2ego_output.ply")
+    print('ply_path = ',ply_path)
     if not os.path.exists(ply_path):
         # Since this data set has no colmap data, we start with random points
         num_pts = 100_000

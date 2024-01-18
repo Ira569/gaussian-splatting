@@ -2,7 +2,7 @@ import numpy as np
 import open3d as o3d
 from addict import Addict
 from loguru import logger
-
+# open3d不好用 mayavi还行
 
 colors_map = [
     [0, 0, 0, 255],
@@ -103,7 +103,7 @@ class RenderPointCloud:
         self.pc = np.load(fpath)
         self.cfg = Addict(cfg)
         self.vis = self.init_vis()
-        if self.cfg.is_voxel:  # voxel size(0.4,0.4,0.4)
+        if self.cfg.is_voxel:
             self.voxel_size = np.array(self.cfg.voxel_size)
         logger.debug(f"Loaded pcd shape: {self.pc.shape}")
 
@@ -162,27 +162,19 @@ class RenderPointCloud:
         self.vis.run()
         self.vis.destroy_window()
 
-from visual import voxel2pcd
-
-
 
 if __name__ == '__main__':
 
     # path = '__tmp/dense_voxel.npy'
-    path = "show_Occ_npy\gt_seman_0.npy"
-    voxel_npy = np.load(path)
-    path_name = 'open3d_npy\gt_seman_0.npy'
-    voxel_npy = voxel2pcd(voxel_npy)
-    np.save(path_name,voxel_npy)
-    path = path_name
-    # voxel_npy2 = np.load(path)
+    path = '/home/lkshpc/pzz/bevdet/show_dirs/occ-nerf256704/vis_npy/gt_seman_0.npy'
+
     cfg = dict(
         window_title='demo',
         colors_map=np.array(colors_map) / 255,
         background_color=[1, 1, 1],
         is_disp_as_voxel=True,
         is_voxel=True,
-        voxel_size=[0.4, 0.4, 0.4],
+        voxel_size=[0.5, 0.5, 0.5],
     )
 
     R = RenderPointCloud(path, cfg)

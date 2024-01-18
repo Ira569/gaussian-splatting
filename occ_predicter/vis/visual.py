@@ -106,7 +106,7 @@ fov_voxels[:, 1] += pc_range[1]
 fov_voxels[:, 2] += pc_range[2]
 
 
-figure = mlab.figure(size=(1440, 960), bgcolor=(0, 0, 0))
+figure = mlab.figure(size=(960, 960), bgcolor=(0, 0, 0))
 
 # figure = mlab.figure(size=(1440, 960), bgcolor=(1, 1, 1))
 # pdb.set_trace()
@@ -146,7 +146,7 @@ fov_voxels2[:, 0] += pc_range[0]
 fov_voxels2[:, 1] += pc_range[1]
 fov_voxels2[:, 2] += pc_range[2]
 
-figure2 = mlab.figure(size=(1440, 960), bgcolor=(0, 0, 0))
+figure2 = mlab.figure(size=(960, 960), bgcolor=(0, 0, 0))
 # figure2 = mlab.figure(size=(1440, 960), bgcolor=(1, 1, 1))
 
 # pdb.set_trace()
