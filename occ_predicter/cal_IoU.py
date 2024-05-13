@@ -27,9 +27,9 @@ def cal_IoU(pred,label):
     FP = ((label == 1) & (pred == 0)).sum()
     FN = ((label == 0) & (pred == 1)).sum()
 
-    print('预测对的占用情况 TP=', TP)
-    print('预测错的占用情况1 FP=', FP)
-    print('预测错的占用情况2 FN=', FN)
+    # print('预测对的占用情况 TP=', TP)
+    # print('预测错的占用情况1 FP=', FP)
+    # print('预测错的占用情况2 FN=', FN)
     IoU = TP / (TP + FP + FN)
     return IoU*100
 

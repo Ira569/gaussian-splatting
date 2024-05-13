@@ -50,7 +50,7 @@ np.save('occ_pred.npy',pred)
 
 from cal_IoU import cal_IoU
 label = np.load('occ_label.npy')
-pred = np.load('occ_pred.npy')
+# pred = np.load('occ_pred.npy')
 # 1应该是free  0应该是 占用，才好用mIoU类
 
 label[label!=17] = 0
@@ -63,6 +63,8 @@ pred[pred==2]=1
 # 如果标签应该是未占用，但是预测为占用，那就是点云重建的太多了，在不应该重建的地方重建了
 print('label occupied sum',200*200*16-label.sum())  # 30093
 print('pred occupied sum',200*200*16-pred.sum())    # 38822
+
+# 调用函数 计算IoU
 IoU = cal_IoU(pred,label)
 print('IoU=',IoU)
 

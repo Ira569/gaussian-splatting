@@ -17,6 +17,8 @@ np.set_printoptions(precision=3, suppress=True)
 # 构建nuScenes类
 version = "v1.0-mini"
 dataroot = "E:/NeRF_git/gaussian-splatting/data/nuscenes"
+dataroot = "../nuscenes"
+
 nuscenes = NuScenes(version, dataroot, verbose=False)
 
 sample = nuscenes.sample[0]
@@ -31,7 +33,13 @@ lidar_points = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5) # (point
 lidar_points_xyz = lidar_points[:,:3]
 #  将ladar_points 转到ego坐标系
 lidar_calibrated_data = nuscenes.get("calibrated_sensor", lidar_sample_data["calibrated_sensor_token"])
-from myvisualize import  get_matrix
+def get_matrix(calibrated_data, inverse=False):
+    output = np.eye(4)
+    output[:3, :3] = Quaternion(calibrated_data["rotation"]).rotation_matrix
+    output[:3, 3]  = calibrated_data["translation"]
+    if inverse:
+        output = np.linalg.inv(output)
+    return output
 # lidar_pose是基于ego而言的
 # point = lidar_pose @ lidar_points.T  代表了 lidar -> ego 的过程
 lidar_to_ego = get_matrix(lidar_calibrated_data)
@@ -52,6 +60,7 @@ point_cloud.points = o3d.utility.Vector3dVector(lidar_points_xyz)
 
 # 保存点云数据为PLY文件  但这还是lidar坐标系下的
 o3d.io.write_point_cloud('./pc2ego_output.ply', point_cloud)
+print('done')
 # ply格式：
 # x：点的x坐标（浮点数# y：点的y坐标（浮点数# z：点的z坐标（浮点数）
 # nx：法线向量的x分量（浮点数）# ny：法线向量的y分量（浮点数）# nz：法线向量的z分量（浮点数）
